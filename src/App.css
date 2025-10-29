@@ -2,62 +2,113 @@ body, html {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f5f7fa;
   color: #333;
 }
 
-.app-container {
+/* == LAYOUT PRINCIPAL == */
+.dashboard {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* == SIDEBAR == */
+.sidebar {
+  width: 280px;
+  background-color: #1e3a8a;
+  color: white;
+  padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh; /* altura total da tela */
-  padding: 2rem;
-  box-sizing: border-box;
-  text-align: center;
 }
 
-h1 {
-  color: #1e3a8a;
+.sidebar h2 {
   margin-bottom: 1rem;
+  font-size: 1.4rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 0.5rem;
 }
 
-.spot-select {
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  margin: 1rem 0 2rem 0;
+.spot-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.spot-list li {
+  padding: 0.75rem 1rem;
   border-radius: 8px;
-  border: 1px solid #ccc;
-  outline: none;
-  transition: all 0.3s ease;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: background 0.3s;
 }
 
-.spot-select:focus {
-  border-color: #1e3a8a;
-  box-shadow: 0 0 5px rgba(30, 58, 138, 0.5);
+.spot-list li:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
-.loading {
-  font-size: 1.2rem;
-  color: #555;
-  margin: 1rem 0;
+.spot-list li.active {
+  background-color: #2563eb;
+  font-weight: bold;
 }
 
-.charts-container {
+/* == CONTEÚDO PRINCIPAL ==*/
+.content {
+  flex: 1;
   display: flex;
-  width: 1600px;
-  flex-wrap: wrap; /* permite quebrar linha */
-  gap: 2rem; /* espaço entre os gráficos */
-  justify-content: center; /* centraliza horizontalmente */
+  flex-direction: column;
+  overflow-y: auto;
 }
 
+.content h1{
+  margin-left: 30px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.content p{
+  margin-left: 30px;
+}
+
+/* == COLUNA DE GRÁFICOS == */
+.charts-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 1500px;
+  padding: 1rem 2rem;
+}
+
+/* == CARTÃO DO GRÁFICO == */
 .chart-card {
   background-color: #fff;
-  padding: 1rem;
+  padding: 1rem 1rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  min-width: 280px; /* largura mínima do gráfico */
-  max-width: 300px; /* largura máxima do gráfico */
-  flex: 1 1 280px; /* grow, shrink, base width */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%; /* ocupa toda largura disponível */
+  height: 400px; /* altura fixa, você pode ajustar */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
+
+.chart-card .recharts-responsive-container {
+  width: 100%;
+  height: 100%;
+}
+
+
+
+/* == SCROLLBAR PERSONALIZADA == */
+.content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background-color: rgba(30, 58, 138, 0.4);
+  border-radius: 8px;
+}
+

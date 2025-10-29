@@ -13,9 +13,9 @@ import "./App.css";
 
 function App() {
   const API_KEY = "8mX7gZlFBm0bJ7jjhjg8atBpr5eGql72xYvIMpT4";
-  const [spots, setSpots] = useState(null);
+  const [spots, setSpots] = useState([]);
   const [selectedSpotId, setSelectedSpotId] = useState(null);
-  const [spotData, setSpotData] = useState(null);
+  const [spotData, setSpotData] = useState([]);
   const [loadingSpots, setLoadingSpots] = useState(false);
   const [loadingSpotData, setLoadingSpotData] = useState(false);
 
@@ -36,6 +36,7 @@ function App() {
     getSpots();
   }, []);
 
+
   useEffect(() => {
     const getSpotData = async () => {
       if (!selectedSpotId) return;
@@ -55,62 +56,76 @@ function App() {
     getSpotData();
   }, [selectedSpotId]);
 
-  const renderChart = (dataKey, color, title, unit = "") => (
-    <div className="chart-card">
-      <h3>{title}</h3>
-      <ResponsiveContainer width="100%" height={250}>
-        <LineChart data={spotData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="timestamp"
-            tickFormatter={(tick) => new Date(tick).toLocaleTimeString()}
-          />
-          <YAxis unit={unit} />
-          <Tooltip labelFormatter={(label) => new Date(label).toLocaleString()} />
-          <Line
-            type="monotone"
-            dataKey={dataKey}
-            stroke={color}
-            dot={false}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
-  );
+  // Renderizar gráfico + valor atual
+  const renderChart = (dataKey, color, title, unit = "") => {
+    if (!spotData || spotData.length === 0) return null;
+    const lastValue = spotData[spotData.length - 1][dataKey];
+
+    return (
+      <div className="chart-card">
+        <div className="chart-header">
+          <h3>{title}</h3>
+          <p className="chart-value">
+            <strong>{lastValue?.toFixed(2)}</strong> {unit}
+          </p>
+        </div>
+       <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={spotData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="timestamp"
+              tickFormatter={(tick) => new Date(tick).toLocaleTimeString()}
+            />
+            <YAxis unit={unit} />
+            <Tooltip labelFormatter={(label) => new Date(label).toLocaleString()} />
+            <Line type="monotone" dataKey={dataKey} stroke={color} dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  };
 
   return (
-    <div className="app-container">
-      <h1>Ponto de Coleta</h1>
+    <div className="dashboard">
+      {/* Coluna esquerda - pontos */}
+      <div className="sidebar">
+        <h2>Pontos de Coleta</h2>
 
-      {loadingSpots && <div className="loading">Carregando pontos...</div>}
+        {loadingSpots && <p>Carregando...</p>}
 
-      {spots && (
-        <select
-          className="spot-select"
-          onChange={(e) => setSelectedSpotId(e.target.value)}
-        >
-          <option value="">Selecione um ponto de coleta</option>
+        <ul className="spot-list">
           {spots.map((spot) => (
-            <option key={spot.spot_id} value={spot.spot_id}>
+            <li
+              key={spot.spot_id}
+              onClick={() => setSelectedSpotId(spot.spot_id)}
+              className={spot.spot_id === selectedSpotId ? "active" : ""}
+            >
               {spot.spot_name}
-            </option>
+            </li>
           ))}
-        </select>
-      )}
+        </ul>
+      </div>
 
-      {loadingSpotData && <div className="loading">Carregando dados...</div>}
+      {/* Coluna direita - gráficos */}
+      <div className="content">
+        <h1>Monitoramento</h1>
 
-      {spotData && spotData.length > 0 && (
-        <div className="charts-container">
-          {renderChart("temperature", "#8884d8", "Temperatura", "°C")}
-          {renderChart("acceleration_axial", "#82ca9d", "Aceleração Axial")}
-          {renderChart("acceleration_horizontal", "#ff7300", "Aceleração Horizontal")}
-          {renderChart("acceleration_vertical", "#387908", "Aceleração Vertical")}
-          {renderChart("velocity_axial", "#e60049", "Velocidade Axial")}
-          {renderChart("velocity_horizontal", "#0a9396", "Velocidade Horizontal")}
-          {renderChart("velocity_vertical", "#ffb703", "Velocidade Vertical")}
-        </div>
-      )}
+        {loadingSpotData && <div className="loading">Carregando dados...</div>}
+
+        {!selectedSpotId && <p>Selecione um ponto à esquerda para visualizar os dados.</p>}
+
+        {spotData && spotData.length > 0 && (
+          <div className="charts-column">
+            {renderChart("temperature", "#8884d8", "Temperatura", "°C")}
+            {renderChart("acceleration_axial", "#82ca9d", "Aceleração Axial")}
+            {renderChart("acceleration_horizontal", "#ff7300", "Aceleração Horizontal")}
+            {renderChart("acceleration_vertical", "#387908", "Aceleração Vertical")}
+            {renderChart("velocity_axial", "#e60049", "Velocidade Axial")}
+            {renderChart("velocity_horizontal", "#0a9396", "Velocidade Horizontal")}
+            {renderChart("velocity_vertical", "#ffb703", "Velocidade Vertical")}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
